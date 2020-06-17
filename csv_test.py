@@ -28,8 +28,8 @@ class CsvTestClass(unittest.TestCase):
 		self.assertTrue(line>0)
 
 	def test_contain_correct_headers(self):
-		required_headers = [r"site abbreviation",r"Number of Turbines at Site",r"UTC Offset",r"Turbine Backup",r"Latitude",r"Longtitude"]
-		line =[]
+		required_headers = [r"site abbreviation",r"Number of Turbines at Site",r"UTC Offset",r"Turbine Backup",
+		                    f"Met Backup Cutoff (inclusive)",r"Latitude",r"Longtitude"]
 		with open(self.csv_file_path,newline='') as csvFile:
 			csvFileReader = csv.reader(csvFile,delimiter=',')
 			line = next(csvFileReader)
@@ -76,6 +76,38 @@ class DatabaseTestClass(unittest.TestCase):
 		number_of_turbines = main.get_number_of_turbines_in_database()
 		self.assertTrue(number_of_turbines == 19)
 
+class EkansTestClass(unittest.TestCase):
+	configuration_db_path = r".\ZubatConfiguration.db"
+	def test_update_site_name(self):
+		site_prefix = "DESER"
+		main.update_site_name(site_prefix)
+		site_name = main.read_database_query( "select DefaultValue from SystemInputTags where description = \"SitePrefix\"")
+		self.assertTrue(site_name == site_prefix)
+
+	def test_update_latitude(self):
+		default_lat = 45.59578
+		main.update_latitude(default_lat)
+		lat = main.read_database_query( "select DefaultValue from SystemInputTags where description = \"Lat\"")
+		self.assertTrue(str(lat) == str(default_lat))
+
+	def test_update_longitude(self):
+		default_lon = -122.60917
+		main.update_longtitude(default_lon)
+		lon = main.read_database_query("select DefaultValue from SystemInputTags where description = \"Lon\"")
+		self.assertTrue(lon == str(default_lon))
+
+	def test_update_UTC(self):
+		default_UTC = -8
+		main.update_utc(default_UTC)
+		lon = main.read_database_query("select DefaultValue from SystemInputTags where description = \"UTCOffset\"")
+		self.assertTrue(lon == str(default_UTC))
+
+	def test_copy_database_file(self):
+		file_name = f"Test-ZubatConfiguration.db"
+		new_database_file_path = f".\\{file_name}"
+		main.copy_database_file(".\ZubatConfiguration.db",new_database_file_path)
+		copied_database_exists = os.path.isfile(new_database_file_path)
+		self.assertTrue(copied_database_exists)
 
 if __name__ == '__main__':
 	unittest.main()

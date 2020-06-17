@@ -1,5 +1,7 @@
 import csv
 import sqlite3
+import os
+import shutil
 
 from pathlib import Path
 
@@ -44,6 +46,9 @@ def connect_to_database(configuration_db_path=".\ZubatConfiguration.db"):
 def get_number_of_turbines_in_database(configuration_db_path=".\ZubatConfiguration.db"):
 	return connect_to_database().cursor().execute("select count(DISTINCT TurbineId) from TurbineOutputTags").fetchone()[0]
 
+def read_database_query(query):
+	return connect_to_database().cursor().execute(query).fetchone()[0]
+
 def execute_database_query(query):
 	conn = connect_to_database()
 	c = conn.cursor()
@@ -62,3 +67,21 @@ if __name__ == "main":
 	main()
 
 
+def update_site_name(site_name):
+	query = f"Update SystemInputTags set DefaultValue = \"{site_name}\" where Description=\"SitePrefix\""
+	execute_database_query(query)
+
+def update_latitude(lat):
+	query = f"Update SystemInputTags set DefaultValue = \"{lat}\" where Description=\"Lat\""
+	execute_database_query(query)
+
+def update_longtitude(lon):
+	query = f"Update SystemInputTags set DefaultValue = \"{lon}\" where Description=\"Lon\""
+	execute_database_query(query)
+
+def update_utc(utc):
+	query = f"Update SystemInputTags set DefaultValue = \"{utc}\" where Description=\"UTCOffset\""
+	execute_database_query(query)
+
+def copy_database_file(src_file_path, dest_file_path):
+	shutil.copy2(src_file_path,dest_file_path)

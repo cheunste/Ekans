@@ -1,2 +1,2 @@
-site abbreviation,Number of Turbines at Site,UTC Offset,Turbine Backup,Latitude,Longtitude
+site abbreviation,Number of Turbines at Site,UTC Offset,Turbine Backup,Met Backup Cutoff (inclusive),Latitude,Longtitude
 test,test,asdfasdf,asdfasdf,-234.0,
