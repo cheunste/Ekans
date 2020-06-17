@@ -1,6 +1,8 @@
 import unittest
 import os
 import csv
+
+import Ekans
 import main
 import DatabaseInteractor
 import CsvInteractor
@@ -51,6 +53,22 @@ class CsvTestClass(unittest.TestCase):
 		self.assertTrue(any(header in csv_map for header in header_line))
 		self.assertTrue(any(values in csv_map.values() for values in dummy_test_list))
 
+	def test_get_all_liens(self):
+		rows = CsvInteractor.get_all_lines_in_csv()
+		self.assertTrue(len(rows)>2)
+
+	def test_get_number_of_turbines_in_csv(self):
+		expected_prefix = "300"
+		test_line = "test, 300, asdfasdf, asdfasdf, -234.0,".split(', ')
+		prefix = CsvInteractor.get_number_of_turbines_in_csv(test_line)
+		self.assertTrue(prefix == expected_prefix)
+
+	def test_get_site_name_in_csv(self):
+		expected_prefix = "test"
+		test_line = "test, test, asdfasdf, asdfasdf, -234.0,".split(',')
+		prefix = CsvInteractor.get_site_prefix(test_line)
+		self.assertTrue(prefix == expected_prefix)
+
 class DatabaseTestClass(unittest.TestCase):
 	csv_file_path = r"./csvFile.csv"
 	configuration_db_path = r".\ZubatConfiguration.db"
@@ -82,32 +100,55 @@ class EkansTestClass(unittest.TestCase):
 	configuration_db_path = r".\ZubatConfiguration.db"
 	def test_update_site_name(self):
 		site_prefix = "DESER"
-		main.update_site_name(site_prefix)
+		Ekans.update_site_name(site_prefix)
 		site_name = DatabaseInteractor.read_database_query( "select DefaultValue from SystemInputTags where description = \"SitePrefix\"")
 		self.assertTrue(site_name == site_prefix)
 
 	def test_update_latitude(self):
 		default_lat = 45.59578
-		main.update_latitude(default_lat)
+		Ekans.update_latitude(default_lat)
 		lat = DatabaseInteractor.read_database_query( "select DefaultValue from SystemInputTags where description = \"Lat\"")
 		self.assertTrue(str(lat) == str(default_lat))
 
 	def test_update_longitude(self):
 		default_lon = -122.60917
-		main.update_longtitude(default_lon)
+		Ekans.update_longtitude(default_lon)
 		lon = DatabaseInteractor.read_database_query("select DefaultValue from SystemInputTags where description = \"Lon\"")
 		self.assertTrue(lon == str(default_lon))
 
 	def test_update_UTC(self):
 		default_UTC = -8
-		main.update_utc(default_UTC)
+		Ekans.update_utc(default_UTC)
 		lon = DatabaseInteractor.read_database_query("select DefaultValue from SystemInputTags where description = \"UTCOffset\"")
 		self.assertTrue(lon == str(default_UTC))
+
+	def test_update_turbine_number(self):
+		turbine_num = 5
+		new_turbine_id = Ekans.build_turbine_id(turbine_num)
+		self.assertTrue(new_turbine_id == "T005")
+
+		turbine_num = 30
+		new_turbine_id = Ekans.build_turbine_id(turbine_num)
+		self.assertTrue(new_turbine_id == "T030")
+
+		turbine_num = 130
+		new_turbine_id = Ekans.build_turbine_id(turbine_num)
+		self.assertTrue(new_turbine_id == "T130")
+
+	def test_replace_turbine_number(self):
+		dummmy_row = "T001,Zubat.T001.Participation,T001.WTUR.TURST.ACTST," \
+		             "T001.WNAC.ExTmp,T001.WNAC.WdSpd,,T001.WTUR.SetTurOp.ActSt.Stop," \
+		             "T001.WTUR.SetTurOp.ActSt.Str,Zubat.T001.PauseTimeOut,Met"
+		new_id = "T003"
+		met_backup = "Met2"
+		new_row = Ekans.generate_new_input_tag_row(dummmy_row,new_id,met_backup)
+		self.assertFalse(any('T001' in item for item in new_row ))
+		self.assertTrue(any(new_id in item for item in new_row ))
 
 	def test_copy_database_file(self):
 		file_name = f"Test-ZubatConfiguration.db"
 		new_database_file_path = f".\\{file_name}"
-		main.copy_database_file(".\ZubatConfiguration.db",new_database_file_path)
+		Ekans.copy_database_file(".\ZubatConfiguration.db", new_database_file_path)
 		copied_database_exists = os.path.isfile(new_database_file_path)
 		self.assertTrue(copied_database_exists)
 
