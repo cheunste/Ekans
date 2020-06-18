@@ -8,7 +8,6 @@ def insert_to_database( line):
 	site_prefix = CsvInteractor.get_site_prefix(line)
 	site_db = f".\\{site_prefix}"+configuration_db_path[1:]
 	copy_database_file(configuration_db_path,site_db)
-	num_turbines = CsvInteractor.get_number_of_turbines_in_csv(line)
 
 
 def update_site_name( site_name):

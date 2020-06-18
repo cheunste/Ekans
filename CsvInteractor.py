@@ -25,7 +25,7 @@ def get_name_of_header_fields():
 
 
 def is_line_contains_empty_cell(line):
-	return any('' in s for s in line)
+	return any(s=='' in s for s in line)
 
 
 def create_csv_map(header_row, csv_row):
@@ -47,3 +47,6 @@ def get_site_prefix(line):
 
 def get_number_of_turbines_in_csv(line):
 	return line[1]
+
+def get_utc_offset(csv_map):
+	return csv_map['UTC Offset']

@@ -1,4 +1,5 @@
 site abbreviation,Number of Turbines at Site,UTC Offset,Turbine Backup,Met Backup Cutoff (inclusive),Latitude,Longtitude
-test,100,asdfasdf,asdfasdf,-234.0,
-test,test,asdfasdf,asdfasdf,-234.0,
-test,test,asdfasdf,asdfasdf,-234.0,
+test,100,asdfasdf,asdfasdf,-234,,
+test,test,asdfasdf,asdfasdf,-234,,
+test,test,asdfasdf,asdfasdf,-234,,
+DESER,104,-5,"T001,T002,T003,T004",T015,1,1

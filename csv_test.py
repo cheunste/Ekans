@@ -12,6 +12,9 @@ from pathlib import Path
 class CsvTestClass(unittest.TestCase):
 	csv_file_path = r"./csvFile.csv"
 
+	def test_update_DB_path(self):
+		DatabaseInteractor.configuration_db_path = f"Test-ZubatConfiguration.db"
+
 	def get_testing_line_from_csv_file(self):
 		with open(self.csv_file_path, newline='') as csvFile:
 			csvFileReader = csv.reader(csvFile, delimiter=',')
@@ -43,6 +46,8 @@ class CsvTestClass(unittest.TestCase):
 	def test_empty_field(self):
 		line=self.get_testing_line_from_csv_file()
 		self.assertTrue(CsvInteractor.is_line_contains_empty_cell(line))
+		line = ['DESER', '104', '-5', 'T001,T002,T003,T004', 'T015', '1', '1']
+		self.assertFalse(CsvInteractor.is_line_contains_empty_cell(line))
 
 	def test_create_map(self):
 		header_line = CsvInteractor.get_name_of_header_fields()
@@ -68,6 +73,16 @@ class CsvTestClass(unittest.TestCase):
 		test_line = "test, test, asdfasdf, asdfasdf, -234.0,".split(',')
 		prefix = CsvInteractor.get_site_prefix(test_line)
 		self.assertTrue(prefix == expected_prefix)
+
+
+	def test_utc_offset(self):
+		csv_map = {'site abbreviation': 'DESER', 'Number of Turbines at Site': '104', 'UTC Offset': '-5',
+		 'Turbine Backup': 'T001,T002,T003,T004', 'Met Backup Cutoff (inclusive)': 'T015', 'Latitude': '1',
+		 'Longtitude': '1'}
+
+		utc = CsvInteractor.get_utc_offset(csv_map)
+		self.assertTrue(utc=='-5')
+
 
 class DatabaseTestClass(unittest.TestCase):
 	csv_file_path = r"./csvFile.csv"
