@@ -12,7 +12,7 @@ class CsvTestClass(unittest.TestCase):
 	csv_file_path = r"./csvFile.csv"
 	csv_map = {'site prefix': 'DESER', 'Number of Turbines at Site': '104', 'UTC Offset': '-5',
 	           'Turbine Backup': 'T001,T002,T003,T004', 'Met Backup Cutoff (inclusive)': 'T015', 'Latitude': '1',
-	           'Longtitude': '1'}
+	           'Longtitude': '1','Number of Met Towers': '2','Met WdSpd Tag':'xxx','Met Temp Tag':'yyy'}
 	def test_update_DB_path(self):
 		DatabaseInteractor.configuration_db_path = f"Test-ZubatConfiguration.db"
 
@@ -37,7 +37,8 @@ class CsvTestClass(unittest.TestCase):
 
 	def test_contain_correct_headers(self):
 		required_headers = [r"site prefix",r"Number of Turbines at Site",r"UTC Offset",r"Turbine Backup",
-		                    f"Met Backup Cutoff (inclusive)",r"Latitude",r"Longtitude"]
+		                    f"Met Backup Cutoff (inclusive)",r"Latitude",r"Longtitude", "Number of Met Towers",
+		                    "Met WdSpd Tag","Met Temp Tag"]
 		with open(self.csv_file_path,newline='') as csvFile:
 			csvFileReader = csv.reader(csvFile,delimiter=',')
 			line = next(csvFileReader)
@@ -90,6 +91,19 @@ class CsvTestClass(unittest.TestCase):
 		lon = CsvInteractor.get_longtitude(self.csv_map)
 		self.assertTrue(lon == '1')
 
+	def test_num_met_tower(self):
+		lon = CsvInteractor.get_num_met_tower(self.csv_map)
+		self.assertTrue(lon == '2')
+
+
+	def test_met_wdspd_tag(self):
+		wdspd_tag = CsvInteractor.get_met_wdpsd_tag(self.csv_map)
+		self.assertTrue(wdspd_tag == 'xxx')
+
+	def test_wdspd_tag(self):
+		temp_tag = CsvInteractor.get_met_temp_tag(self.csv_map)
+		self.assertTrue(temp_tag == 'yyy')
+
 class DatabaseTestClass(unittest.TestCase):
 	csv_file_path = r"./csvFile.csv"
 	configuration_db_path = r".\ZubatConfiguration.db"
@@ -136,11 +150,12 @@ class DatabaseTestClass(unittest.TestCase):
 		DatabaseInteractor.execute_database_query(delete_query)
 		connection.close()
 
+
 class EkansTestClass(unittest.TestCase):
 	configuration_db_path = r".\ZubatConfiguration.db"
 	csv_map = {'site prefix': 'DESER', 'Number of Turbines at Site': '104', 'UTC Offset': '-5',
 	           'Turbine Backup': 'T001,T002,T003,T004', 'Met Backup Cutoff (inclusive)': 'T015', 'Latitude': '1',
-	           'Longtitude': '1'}
+	           'Longtitude': '1','Number of Met Towers': '2','Met WdSpd Tag':'xxx','Met Temp Tag':'yyy'}
 	def test_update_site_name(self):
 		site_prefix = "DESER"
 		Ekans.update_site_name(site_prefix)
@@ -184,7 +199,7 @@ class EkansTestClass(unittest.TestCase):
 		             "T001.WTUR.SetTurOp.ActSt.Str,Zubat.T001.PauseTimeOut,Met".split(',')
 		new_id = "T003"
 		met_backup = "Met2"
-		new_row = Ekans.generate_new_input_tag_row(dummmy_row,new_id,met_backup)
+		new_row = Ekans.generate_new_input_tag_row(dummmy_row,new_id,met_backup,"")
 		print(new_row)
 		self.assertFalse(any('T001' in item for item in new_row ))
 		self.assertTrue(any(new_id in item for item in new_row ))
@@ -217,6 +232,9 @@ class EkansTestClass(unittest.TestCase):
 
 	def test_insert_turbine_output_table(self):
 		Ekans.insert_to_turbine_output_table(self.csv_map)
+
+	def test_update_met_tower(self):
+		Ekans.update_met_tower(self.csv_map)
 
 	def test_copy_database_file(self):
 		file_name = f"Test-ZubatConfiguration.db"

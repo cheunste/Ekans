@@ -1,5 +1,5 @@
-site prefix,Number of Turbines at Site,UTC Offset,Turbine Backup,Met Backup Cutoff (inclusive),Latitude,Longtitude
+site prefix,Number of Turbines at Site,UTC Offset,Turbine Backup,Met Backup Cutoff (inclusive),Latitude,Longtitude,Number of Met Towers,Met WdSpd Tag,Met Temp Tag
 test,100,asdfasdf,asdfasdf,-234,,
 test,test,asdfasdf,asdfasdf,-234,,
 test,test,asdfasdf,asdfasdf,-234,,
-DESER,104,-5,"T001,T002,T003,T004",T015,1,1
+DESER,104,-5,"T001,T002,T003,T004",T015,1,1,2,Met.Alt1.VelHoriz,Met.Alt2.Temp

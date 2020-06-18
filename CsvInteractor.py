@@ -73,3 +73,15 @@ def get_latitude(csv_map):
 
 def get_longtitude(csv_map):
 	return csv_map['Longtitude']
+
+
+def get_num_met_tower(csv_map):
+	return csv_map['Number of Met Towers']
+
+
+def get_met_wdpsd_tag(csv_map):
+	return csv_map["Met WdSpd Tag"]
+
+
+def get_met_temp_tag(csv_map):
+	return csv_map["Met Temp Tag"]

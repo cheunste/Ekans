@@ -21,6 +21,7 @@ def main():
 			Ekans.update_utc(CsvInteractor.get_utc_offset(csv_map))
 			Ekans.insert_to_turbine_input_table(csv_map)
 			Ekans.insert_to_turbine_output_table(csv_map)
+			Ekans.update_met_tower(csv_map)
 	return
 
 if __name__ == "__main__":
