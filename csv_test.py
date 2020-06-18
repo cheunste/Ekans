@@ -180,6 +180,13 @@ class EkansTestClass(unittest.TestCase):
 			f"Update Turbineinputtags set isbackupturbine='' where TurbineId='{dummy_row[0]}'")
 
 
+	def test_update_evaluation_time(self):
+		Ekans.update_evaluation_time()
+		result = DatabaseInteractor.read_database_query(
+			f"select defaultvalue from systeminputtags where description = 'EvaluationPeriod'")
+		print(result)
+		self.assertTrue(result == '10')
+
 
 	def test_copy_database_file(self):
 		file_name = f"Test-ZubatConfiguration.db"
@@ -187,6 +194,7 @@ class EkansTestClass(unittest.TestCase):
 		Ekans.copy_database_file(".\ZubatConfiguration.db", new_database_file_path)
 		copied_database_exists = os.path.isfile(new_database_file_path)
 		self.assertTrue(copied_database_exists)
+
 
 if __name__ == '__main__':
 	unittest.main()
