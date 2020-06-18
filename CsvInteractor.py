@@ -1,4 +1,5 @@
 import csv
+import re
 
 csv_file_path = r"./csvFile.csv"
 
@@ -60,6 +61,9 @@ def get_turbine_backup(csv_map):
 
 
 def get_met_backup(csv_map):
+	met_tower_backup = csv_map['Met Backup Cutoff (inclusive)']
+	Turbine_num = int(re.search("\d+",met_tower_backup).group())
+	print("adfasdfasdf" ,Turbine_num)
 	return csv_map['Met Backup Cutoff (inclusive)']
 
 

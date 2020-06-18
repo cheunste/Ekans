@@ -22,6 +22,8 @@ def get_number_of_turbines_in_database(configuration_db_path=".\ZubatConfigurati
 def read_database_query(query):
 	return connect_to_database().cursor().execute(query).fetchone()[0]
 
+def read_database_row(query):
+	return connect_to_database().cursor().execute(query).fetchall()
 
 def execute_database_query(query):
 	conn = connect_to_database()

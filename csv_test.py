@@ -103,20 +103,20 @@ class DatabaseTestClass(unittest.TestCase):
 
 	def test_read_from_sql(self):
 		number_of_turbines = DatabaseInteractor.get_number_of_turbines_in_database()
-		self.assertTrue(number_of_turbines == 19)
+		self.assertTrue(number_of_turbines == 104)
 
 	def test_insert_to_db(self):
 
 		query = f"INSERT into TurbineInputTags VALUES ('Test','Test','Test','Test','Test','Test','Test','Test','Test','Test')"
 		DatabaseInteractor.execute_database_query(query)
 		number_of_turbines = DatabaseInteractor.get_number_of_turbines_in_database()
-		self.assertTrue(number_of_turbines >= 19)
+		self.assertTrue(number_of_turbines >= 104)
 
 	def test_remove_from_db(self):
 		query = f"Delete from TurbineInputTags WHERE TurbineId=\"Test\""
 		DatabaseInteractor.execute_database_query(query)
 		number_of_turbines = DatabaseInteractor.get_number_of_turbines_in_database()
-		self.assertTrue(number_of_turbines == 19)
+		self.assertTrue(number_of_turbines == 104)
 
 	def test_tuple_list_insert(self):
 		query = 'INSERT INTO TurbineINputTags VALUES (?,?,?,?,?,?,?,?,?,?)'
@@ -131,7 +131,7 @@ class DatabaseTestClass(unittest.TestCase):
 		connection = DatabaseInteractor.connect_to_database()
 		result = connection.cursor().execute(read_query).fetchall()
 		self.assertIsNotNone(result)
-		self.assertTrue(len(result) == 3)
+		self.assertTrue(len(result) == 4)
 		delete_query = "DELETE from TurbineInputTags where TurbineId=='T100'"
 		DatabaseInteractor.execute_database_query(delete_query)
 		connection.close()
@@ -181,10 +181,11 @@ class EkansTestClass(unittest.TestCase):
 	def test_replace_turbine_number(self):
 		dummmy_row = "T001,Zubat.T001.Participation,T001.WTUR.TURST.ACTST," \
 		             "T001.WNAC.ExTmp,T001.WNAC.WdSpd,,T001.WTUR.SetTurOp.ActSt.Stop," \
-		             "T001.WTUR.SetTurOp.ActSt.Str,Zubat.T001.PauseTimeOut,Met"
+		             "T001.WTUR.SetTurOp.ActSt.Str,Zubat.T001.PauseTimeOut,Met".split(',')
 		new_id = "T003"
 		met_backup = "Met2"
 		new_row = Ekans.generate_new_input_tag_row(dummmy_row,new_id,met_backup)
+		print(new_row)
 		self.assertFalse(any('T001' in item for item in new_row ))
 		self.assertTrue(any(new_id in item for item in new_row ))
 
@@ -214,10 +215,13 @@ class EkansTestClass(unittest.TestCase):
 	def test_insert_turbine_input_table(self):
 		Ekans.insert_to_turbine_input_table(self.csv_map)
 
+	def test_insert_turbine_output_table(self):
+		Ekans.insert_to_turbine_output_table(self.csv_map)
+
 	def test_copy_database_file(self):
 		file_name = f"Test-ZubatConfiguration.db"
 		new_database_file_path = f".\\{file_name}"
-		Ekans.copy_database_file(".\ZubatConfiguration.db", new_database_file_path)
+		Ekans.copy_database_file(f".\\ZubatConfiguration.db", new_database_file_path)
 		copied_database_exists = os.path.isfile(new_database_file_path)
 		self.assertTrue(copied_database_exists)
 

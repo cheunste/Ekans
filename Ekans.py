@@ -10,6 +10,35 @@ def create_new_database(csv_map, configuration_db_path):
 	print(site_db)
 	DatabaseInteractor.configuration_db_path=site_db
 
+def insert_to_turbine_input_table(csv_map):
+	table = "TurbineInputTags"
+	num_turbines_in_csv = int(CsvInteractor.get_number_of_turbines_in_csv(csv_map))
+	#You'll also have to deal wit hthe met tower, but do this later
+	#Starts from 2 because T001 is already in the DB
+	insert_rows = []
+	for i in range (2,num_turbines_in_csv+1):
+		turbine_id = build_turbine_id(i)
+		row = get_default_row(table)
+		new_turbine_tuple = generate_new_input_tag_row(list(row[0]), turbine_id, "Met")
+		insert_rows.append(new_turbine_tuple)
+	query = f"INSERT INTO {table} VALUES (?,?,?,?,?,?,?,?,?,?)"
+	DatabaseInteractor.execute_many_database_query(query,insert_rows)
+	return
+
+def insert_to_turbine_output_table(csv_map):
+	table = "TurbineOutputTags"
+	num_turbines_in_csv = int(CsvInteractor.get_number_of_turbines_in_csv(csv_map))
+	#You'll also have to deal wit hthe met tower, but do this later
+	#Starts from 2 because T001 is already in the DB
+	insert_rows = []
+	for i in range (2,num_turbines_in_csv+1):
+		turbine_id = build_turbine_id(i)
+		row = get_default_row(table)
+		new_turbine_tuple = generate_new_output_tag_row(list(row[0]), turbine_id)
+		insert_rows.append(new_turbine_tuple)
+	query = f"INSERT INTO {table} VALUES (?,?,?,?,?,?,?,?,?,?,?)"
+	DatabaseInteractor.execute_many_database_query(query,insert_rows)
+	return
 
 def update_site_name( site_name):
 	query = f"Update SystemInputTags set DefaultValue = \"{site_name}\" where Description=\"SitePrefix\""
@@ -40,11 +69,13 @@ def build_turbine_id(turbine_num):
 
 
 def generate_new_input_tag_row(row,id,metbackup):
-	new_row = [item.replace("T001",id) for item in row.split(',')]
+	new_row = [item.replace("T001",id) for item in row]
 	new_row[9] = metbackup
-	print(tuple(new_row))
 	return tuple(new_row)
 
+def generate_new_output_tag_row(row,id):
+	new_row = [item.replace("T001",id) for item in row]
+	return tuple(new_row)
 
 def is_backup_turbine(turbine_row,backup_turbine_list):
 	return turbine_row in backup_turbine_list
@@ -53,8 +84,8 @@ def make_turbine_backup(turbine_Id):
 	DatabaseInteractor.execute_database_query(
 		f"Update TurbineInputTags set IsBackupTurbine = 'true' where TurbineId = '{turbine_Id}'")
 
-def insert_to_turbine_input_table(csv_map):
-	return
+def get_default_row(turbine_table):
+	return DatabaseInteractor.read_database_row(f"SELECT * from {turbine_table} WHERE TurbineId=='T001'")
 
 
 def update_evaluation_time():
