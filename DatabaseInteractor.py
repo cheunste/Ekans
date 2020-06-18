@@ -27,4 +27,13 @@ def execute_database_query(query,databasePath=".\ZubatConfiguration.db"):
 	c = conn.cursor()
 	c.execute(query)
 	conn.commit()
+	conn.close()
+	return
+
+def execute_many_database_query(query, tuple_list,databasePath=".\ZubatConfiguration.db"):
+	conn = connect_to_database(databasePath)
+	c = conn.cursor()
+	c.executemany(query,tuple_list)
+	conn.commit()
+	conn.close()
 	return

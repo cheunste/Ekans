@@ -85,6 +85,7 @@ class DatabaseTestClass(unittest.TestCase):
 		self.assertTrue(number_of_turbines == 19)
 
 	def test_insert_to_db(self):
+
 		query = f"INSERT into TurbineInputTags VALUES ('Test','Test','Test','Test','Test','Test','Test','Test','Test','Test')"
 		DatabaseInteractor.execute_database_query(query)
 		number_of_turbines = DatabaseInteractor.get_number_of_turbines_in_database()
@@ -95,6 +96,24 @@ class DatabaseTestClass(unittest.TestCase):
 		DatabaseInteractor.execute_database_query(query)
 		number_of_turbines = DatabaseInteractor.get_number_of_turbines_in_database()
 		self.assertTrue(number_of_turbines == 19)
+
+	def test_tuple_list_insert(self):
+		query = 'INSERT INTO TurbineINputTags VALUES (?,?,?,?,?,?,?,?,?,?)'
+		rows = [
+		        ('T100','Zubat.T100.Participation','T100.WTUR.TURST.ACTST','T100.WNAC.ExTmp','T100.WNAC.WdSpd','','T100.WTUR.SetTurOp.ActSt.Stop','T100.WTUR.SetTurOp.ActSt.Str','Zubat.T100.PauseTimeOut','Met'),
+		        ('T100','Zubat.T100.Participation','T100.WTUR.TURST.ACTST','T100.WNAC.ExTmp','T100.WNAC.WdSpd','','T100.WTUR.SetTurOp.ActSt.Stop','T100.WTUR.SetTurOp.ActSt.Str','Zubat.T100.PauseTimeOut','Met'),
+		        ('T100','Zubat.T100.Participation','T100.WTUR.TURST.ACTST','T100.WNAC.ExTmp','T100.WNAC.WdSpd','','T100.WTUR.SetTurOp.ActSt.Stop','T100.WTUR.SetTurOp.ActSt.Str','Zubat.T100.PauseTimeOut','Met')
+		        ]
+		DatabaseInteractor.execute_many_database_query(query,rows)
+
+		read_query = "SELECT * from TurbineInputTags where TurbineId=='T100'"
+		connection = DatabaseInteractor.connect_to_database()
+		result = connection.cursor().execute(read_query).fetchall()
+		self.assertIsNotNone(result)
+		self.assertTrue(len(result) == 3)
+		delete_query = "DELETE from TurbineInputTags where TurbineId=='T100'"
+		DatabaseInteractor.execute_database_query(delete_query)
+		connection.close()
 
 class EkansTestClass(unittest.TestCase):
 	configuration_db_path = r".\ZubatConfiguration.db"
@@ -144,6 +163,23 @@ class EkansTestClass(unittest.TestCase):
 		new_row = Ekans.generate_new_input_tag_row(dummmy_row,new_id,met_backup)
 		self.assertFalse(any('T001' in item for item in new_row ))
 		self.assertTrue(any(new_id in item for item in new_row ))
+
+	def test_backup_turbine_update(self):
+		dummy_row = "T001,Zubat.T001.Participation,T001.WTUR.TURST.ACTST," \
+		             "T001.WNAC.ExTmp,T001.WNAC.WdSpd,,T001.WTUR.SetTurOp.ActSt.Stop," \
+		             "T001.WTUR.SetTurOp.ActSt.Str,Zubat.T001.PauseTimeOut,Met".split(',')
+		backup_turbines = "T001,T003,T049,T099".split(',')
+		self.assertTrue(Ekans.is_backup_turbine(dummy_row[0],backup_turbines))
+		self.assertFalse(Ekans.is_backup_turbine(dummy_row[0],''))
+		if(Ekans.is_backup_turbine(dummy_row[0], backup_turbines)):
+			Ekans.make_turbine_backup(dummy_row[0])
+		result = DatabaseInteractor.read_database_query(
+			f"select isbackupturbine from TurbineInputTags where TurbineId = '{dummy_row[0]}'")
+		self.assertTrue(result)
+		DatabaseInteractor.execute_database_query(
+			f"Update Turbineinputtags set isbackupturbine='' where TurbineId='{dummy_row[0]}'")
+
+
 
 	def test_copy_database_file(self):
 		file_name = f"Test-ZubatConfiguration.db"
