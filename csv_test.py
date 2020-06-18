@@ -3,7 +3,6 @@ import os
 import csv
 
 import Ekans
-import main
 import DatabaseInteractor
 import CsvInteractor
 from pathlib import Path
@@ -11,7 +10,9 @@ from pathlib import Path
 
 class CsvTestClass(unittest.TestCase):
 	csv_file_path = r"./csvFile.csv"
-
+	csv_map = {'site prefix': 'DESER', 'Number of Turbines at Site': '104', 'UTC Offset': '-5',
+	           'Turbine Backup': 'T001,T002,T003,T004', 'Met Backup Cutoff (inclusive)': 'T015', 'Latitude': '1',
+	           'Longtitude': '1'}
 	def test_update_DB_path(self):
 		DatabaseInteractor.configuration_db_path = f"Test-ZubatConfiguration.db"
 
@@ -35,7 +36,7 @@ class CsvTestClass(unittest.TestCase):
 		self.assertTrue(line>0)
 
 	def test_contain_correct_headers(self):
-		required_headers = [r"site abbreviation",r"Number of Turbines at Site",r"UTC Offset",r"Turbine Backup",
+		required_headers = [r"site prefix",r"Number of Turbines at Site",r"UTC Offset",r"Turbine Backup",
 		                    f"Met Backup Cutoff (inclusive)",r"Latitude",r"Longtitude"]
 		with open(self.csv_file_path,newline='') as csvFile:
 			csvFileReader = csv.reader(csvFile,delimiter=',')
@@ -63,26 +64,31 @@ class CsvTestClass(unittest.TestCase):
 		self.assertTrue(len(rows)>2)
 
 	def test_get_number_of_turbines_in_csv(self):
-		expected_prefix = "300"
-		test_line = "test, 300, asdfasdf, asdfasdf, -234.0,".split(', ')
-		prefix = CsvInteractor.get_number_of_turbines_in_csv(test_line)
+		expected_prefix = "104"
+		prefix = CsvInteractor.get_number_of_turbines_in_csv(self.csv_map)
 		self.assertTrue(prefix == expected_prefix)
 
 	def test_get_site_name_in_csv(self):
-		expected_prefix = "test"
-		test_line = "test, test, asdfasdf, asdfasdf, -234.0,".split(',')
-		prefix = CsvInteractor.get_site_prefix(test_line)
+		expected_prefix = "DESER"
+		prefix = CsvInteractor.get_site_prefix(self.csv_map)
 		self.assertTrue(prefix == expected_prefix)
 
 
 	def test_utc_offset(self):
-		csv_map = {'site abbreviation': 'DESER', 'Number of Turbines at Site': '104', 'UTC Offset': '-5',
-		 'Turbine Backup': 'T001,T002,T003,T004', 'Met Backup Cutoff (inclusive)': 'T015', 'Latitude': '1',
-		 'Longtitude': '1'}
-
-		utc = CsvInteractor.get_utc_offset(csv_map)
+		utc = CsvInteractor.get_utc_offset(self.csv_map)
 		self.assertTrue(utc=='-5')
 
+	def test_met_backup(self):
+		met = CsvInteractor.get_met_backup(self.csv_map)
+		self.assertTrue(met=="T015")
+
+	def test_get_latitude(self):
+		lat = CsvInteractor.get_latitude(self.csv_map)
+		self.assertTrue(lat=='1')
+
+	def test_longtitude(self):
+		lon = CsvInteractor.get_longtitude(self.csv_map)
+		self.assertTrue(lon == '1')
 
 class DatabaseTestClass(unittest.TestCase):
 	csv_file_path = r"./csvFile.csv"
@@ -132,6 +138,9 @@ class DatabaseTestClass(unittest.TestCase):
 
 class EkansTestClass(unittest.TestCase):
 	configuration_db_path = r".\ZubatConfiguration.db"
+	csv_map = {'site prefix': 'DESER', 'Number of Turbines at Site': '104', 'UTC Offset': '-5',
+	           'Turbine Backup': 'T001,T002,T003,T004', 'Met Backup Cutoff (inclusive)': 'T015', 'Latitude': '1',
+	           'Longtitude': '1'}
 	def test_update_site_name(self):
 		site_prefix = "DESER"
 		Ekans.update_site_name(site_prefix)
@@ -202,6 +211,8 @@ class EkansTestClass(unittest.TestCase):
 		print(result)
 		self.assertTrue(result == '10')
 
+	def test_insert_turbine_input_table(self):
+		Ekans.insert_to_turbine_input_table(self.csv_map)
 
 	def test_copy_database_file(self):
 		file_name = f"Test-ZubatConfiguration.db"

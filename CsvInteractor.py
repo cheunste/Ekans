@@ -42,11 +42,30 @@ def get_all_lines_in_csv():
 			lines.append(row)
 	return lines
 
-def get_site_prefix(line):
-	return line[0]
 
-def get_number_of_turbines_in_csv(line):
-	return line[1]
+def get_site_prefix(line):
+	return line["site prefix"]
+
+
+def get_number_of_turbines_in_csv(csv_map):
+	return csv_map["Number of Turbines at Site"]
+
 
 def get_utc_offset(csv_map):
 	return csv_map['UTC Offset']
+
+
+def get_turbine_backup(csv_map):
+	return csv_map['Turbine Backup']
+
+
+def get_met_backup(csv_map):
+	return csv_map['Met Backup Cutoff (inclusive)']
+
+
+def get_latitude(csv_map):
+	return csv_map['Latitude']
+
+
+def get_longtitude(csv_map):
+	return csv_map['Longtitude']

@@ -2,12 +2,13 @@ import shutil
 
 import CsvInteractor,DatabaseInteractor
 from DatabaseInteractor import execute_database_query
-from main import configuration_db_path
 
-def insert_to_database( line):
-	site_prefix = CsvInteractor.get_site_prefix(line)
-	site_db = f".\\{site_prefix}"+configuration_db_path[1:]
+def create_new_database(csv_map, configuration_db_path):
+	site_prefix = CsvInteractor.get_site_prefix(csv_map)
+	site_db = f".\\{site_prefix}-"+configuration_db_path[2:]
 	copy_database_file(configuration_db_path,site_db)
+	print(site_db)
+	DatabaseInteractor.configuration_db_path=site_db
 
 
 def update_site_name( site_name):
@@ -51,6 +52,9 @@ def is_backup_turbine(turbine_row,backup_turbine_list):
 def make_turbine_backup(turbine_Id):
 	DatabaseInteractor.execute_database_query(
 		f"Update TurbineInputTags set IsBackupTurbine = 'true' where TurbineId = '{turbine_Id}'")
+
+def insert_to_turbine_input_table(csv_map):
+	return
 
 
 def update_evaluation_time():

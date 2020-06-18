@@ -1,8 +1,6 @@
-import CsvInteractor
-import Ekans
+import CsvInteractor,Ekans
 
 configuration_db_path=".\ZubatConfiguration.db"
-
 
 def main():
 	header_row = CsvInteractor.get_name_of_header_fields()
@@ -11,17 +9,17 @@ def main():
 		##Verify the row contents first
 		if not CsvInteractor.is_line_contains_empty_cell(row):
 			csv_map = CsvInteractor.create_csv_map(header_row,row)
-			num_turbines = CsvInteractor.get_number_of_turbine()
+			num_turbines = CsvInteractor.get_number_of_turbines_in_csv(csv_map)
+			print(num_turbines)
 			#Once verified, create a new site DB
-			Ekans.insert_to_database(row)
+			Ekans.create_new_database(csv_map, configuration_db_path)
 			##Then update it
 			Ekans.update_evaluation_time()
-			Ekans.update_latitude()
-			Ekans.update_longtitude()
-			Ekans.update_site_name()
-			Ekans.update_utc()
-			Ekans.insert_to_database()
+			Ekans.update_latitude(CsvInteractor.get_latitude(csv_map))
+			Ekans.update_longtitude(CsvInteractor.get_longtitude(csv_map))
+			Ekans.update_site_name(CsvInteractor.get_site_prefix(csv_map))
+			Ekans.update_utc(CsvInteractor.get_utc_offset(csv_map))
 	return
 
-if __name__ == "main":
+if __name__ == "__main__":
 	main()
