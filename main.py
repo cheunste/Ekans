@@ -1,6 +1,6 @@
 import CsvInteractor,Ekans
 
-configuration_db_path=".\ZubatConfiguration.db"
+configuration_db_path=".\Databases\ZubatConfiguration.db"
 
 def main():
 	header_row = CsvInteractor.get_name_of_header_fields()
