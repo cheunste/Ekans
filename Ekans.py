@@ -5,7 +5,8 @@ from DatabaseInteractor import execute_database_query
 
 def create_new_database(csv_map, configuration_db_path):
 	site_prefix = CsvInteractor.get_site_prefix(csv_map)
-	site_db = f".\\{site_prefix}-"+configuration_db_path[2:]
+	#site_db = f".\\{site_prefix}-"+configuration_db_path[2:]
+	site_db = f".\\Databases\\{site_prefix}-ZubatConfiguration.db"
 	copy_database_file(configuration_db_path,site_db)
 	print(site_db)
 	DatabaseInteractor.configuration_db_path=site_db
