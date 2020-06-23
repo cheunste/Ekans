@@ -51,8 +51,12 @@ def insert_to_turbine_output_table(csv_map):
 
 def update_met_tower(csv_map):
 	num_met_at_site = CsvInteractor.get_num_met_tower(csv_map)
+	temp_tag = CsvInteractor.get_met_temp_tag(csv_map)
+	wdspd_tag = CsvInteractor.get_met_wdpsd_tag(csv_map)
 	if num_met_at_site == '1':
 		only_one_met_tower_at_site()
+		update_met_tower_temp_tag("Met", temp_tag)
+		update_met_tower_wdspd_tag("Met", wdspd_tag)
 		return
 	else:
 		for i in range(2,int(num_met_at_site)+1):
@@ -86,12 +90,14 @@ def update_utc( utc):
 
 def update_met_tower_wdspd_tag(met_id,tag):
 	table="MetTowerInputTags"
-	query = f"Update {table} set WindSpeedValueTag='{tag}' where MetId='{met_id}'"
+	modified_tag = tag.replace("Met",met_id)
+	query = f"Update {table} set WindSpeedValueTag='{modified_tag}' where MetId='{met_id}'"
 	DatabaseInteractor.execute_database_query(query)
 
 def update_met_tower_temp_tag(met_id,tag):
 	table="MetTowerInputTags"
-	query = f"Update {table} set TempValueTag='{tag}' where MetId='{met_id}'"
+	modified_tag = tag.replace("Met",met_id)
+	query = f"Update {table} set TempValueTag='{modified_tag}' where MetId='{met_id}'"
 	DatabaseInteractor.execute_database_query(query)
 
 
