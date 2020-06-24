@@ -54,7 +54,7 @@ def update_met_tower(csv_map):
 	temp_tag = CsvInteractor.get_met_temp_tag(csv_map)
 	wdspd_tag = CsvInteractor.get_met_wdpsd_tag(csv_map)
 	if num_met_at_site == '1':
-		only_one_met_tower_at_site()
+		only_one_met_tower_at_site(num_met_at_site )
 		update_met_tower_temp_tag("Met", temp_tag)
 		update_met_tower_wdspd_tag("Met", wdspd_tag)
 		return
@@ -103,7 +103,9 @@ def update_met_tower_temp_tag(met_id,tag):
 
 def only_one_met_tower_at_site(num_met_tower):
 	if num_met_tower == '1':
-		query = f"Delete MetTowerInputs where MetId==\"Met2\""
+		query = f"Delete from MetTowerInputTags where MetId==\"Met2\""
+		execute_database_query(query)
+		query = f"Delete from MetTowerOutputTags where MetId==\"Met2\""
 		execute_database_query(query)
 
 def insert_new_met_tower_row(met_id):
