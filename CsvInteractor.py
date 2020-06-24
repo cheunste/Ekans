@@ -24,6 +24,30 @@ def get_name_of_header_fields():
 		line = csvFileReader.__next__()
 	return line
 
+def read_turbine_rows_in_file():
+	turbine_csv_file_path = ".\\turbinesGepora.csv"
+	turbineLines = []
+	#Read the turbine rows from the spreadsheet
+	with open(turbine_csv_file_path, newline='') as turbineFile:
+		csvFileReader = csv.reader(turbineFile, delimiter='\t')
+		for row in csvFileReader:
+			turbineLines.append(row)
+	return turbineLines
+
+def create_new_turbine_in_gepora_spreadhsheet(csv_map):
+	num_turbines = int(get_number_of_turbines_in_csv(csv_map))
+	site_prefix = get_site_prefix(csv_map)
+	new_turbine_csv_file_path = f".\\csv\\{site_prefix}-Gepora.csv"
+	default_row = read_turbine_rows_in_file()
+
+	with open(new_turbine_csv_file_path,'w',newline='\n')as turbineFile:
+		csvFileWriter = csv.writer(turbineFile,delimiter=',')
+		for i in range (1,num_turbines+1):
+			for j in range (0,len(default_row)):
+				new_row = [item.replace('T001', f"T{i:03}") for item in default_row[j]]
+				csvFileWriter.writerow(new_row)
+
+	return
 
 def is_line_contains_empty_cell(line):
 	return any(s=='' in s for s in line)

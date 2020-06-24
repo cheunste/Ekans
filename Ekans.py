@@ -156,3 +156,5 @@ def get_default_row(turbine_table):
 def update_evaluation_time():
 	DatabaseInteractor.execute_database_query(
 		f"Update SYsteminputTags set defaultvalue = '10' where description = 'EvaluationPeriod'")
+
+
