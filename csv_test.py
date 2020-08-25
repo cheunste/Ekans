@@ -5,6 +5,7 @@ import csv
 import Ekans
 import DatabaseInteractor
 import CsvInteractor
+import TurbineMap
 from pathlib import Path
 
 
@@ -48,7 +49,7 @@ class CsvTestClass(unittest.TestCase):
 	def test_empty_field(self):
 		line=self.get_testing_line_from_csv_file()
 		self.assertTrue(CsvInteractor.is_line_contains_empty_cell(line))
-		line = ['DESER', '104', '-5', 'T001,T002,T003,T004', 'T015', '1', '1']
+		line = ['XXXXX', '104', '-5', 'T001,T002,T003,T004', 'T015', '1', '1']
 		self.assertFalse(CsvInteractor.is_line_contains_empty_cell(line))
 
 	def test_create_map(self):
@@ -242,6 +243,20 @@ class EkansTestClass(unittest.TestCase):
 		Ekans.copy_database_file(f".\\ZubatConfiguration.db", new_database_file_path)
 		copied_database_exists = os.path.isfile(new_database_file_path)
 		self.assertTrue(copied_database_exists)
+
+class TurbineMapClass(unittest.TestCase):
+
+	def test_read_from_table(self):
+		self.assertTrue(TurbineMap.does_table_exist_for_site("DESER"))
+
+	def test_get_frontvue_name_from_table_given_id(self):
+		self.assertEqual(
+			TurbineMap.get_frontvue_name_from_table("DESER","T001"),"A01",
+			"Turbine T001 should have received A01, but it didn't"
+		)
+		self.assertFalse(TurbineMap.get_frontvue_name_from_table("DESER", "T200"),
+		                 "Turbine 200 doesn't exist and should return false if it doesn't exisst")
+
 
 
 if __name__ == '__main__':

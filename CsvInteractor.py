@@ -1,5 +1,6 @@
 import csv
 import re
+import TurbineMap
 
 csv_file_path = r"./csvFile.csv"
 
@@ -29,7 +30,7 @@ def read_turbine_rows_in_file():
 	turbineLines = []
 	#Read the turbine rows from the spreadsheet
 	with open(turbine_csv_file_path, newline='') as turbineFile:
-		csvFileReader = csv.reader(turbineFile, delimiter='\t')
+		csvFileReader = csv.reader(turbineFile, delimiter=',')
 		for row in csvFileReader:
 			turbineLines.append(row)
 	return turbineLines
@@ -39,12 +40,21 @@ def create_new_turbine_in_gepora_spreadhsheet(csv_map):
 	site_prefix = get_site_prefix(csv_map)
 	new_turbine_csv_file_path = f".\\csv\\{site_prefix}-Gepora.csv"
 	default_row = read_turbine_rows_in_file()
+	turbine_map_exists = False
+	frontvue_turbine_name=''
+
+	if TurbineMap.does_table_exist_for_site(site_prefix):
+		turbine_map_exists = True
 
 	with open(new_turbine_csv_file_path,'w',newline='\n')as turbineFile:
 		csvFileWriter = csv.writer(turbineFile,delimiter=',')
 		for i in range (1,num_turbines+1):
+			new_turbine_id = f"T{i:03}"
+			if turbine_map_exists:
+				frontvue_turbine_name = TurbineMap.get_frontvue_name_from_table(site_prefix,new_turbine_id)
 			for j in range (0,len(default_row)):
-				new_row = [item.replace('T001', f"T{i:03}") for item in default_row[j]]
+				new_row = [item.replace('T001', new_turbine_id) for item in default_row[j]]
+				new_row[27] = frontvue_turbine_name
 				csvFileWriter.writerow(new_row)
 
 	return
