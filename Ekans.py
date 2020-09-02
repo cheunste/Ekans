@@ -53,19 +53,21 @@ def update_met_tower(csv_map):
 	num_met_at_site = CsvInteractor.get_num_met_tower(csv_map)
 	temp_tag = CsvInteractor.get_met_temp_tag(csv_map)
 	wdspd_tag = CsvInteractor.get_met_wdpsd_tag(csv_map)
-	if num_met_at_site == '1':
-		only_one_met_tower_at_site(num_met_at_site )
-		update_met_tower_temp_tag("Met", temp_tag)
-		update_met_tower_wdspd_tag("Met", wdspd_tag)
-		return
+
+	update_met_tower_temp_tag("Met", temp_tag)
+	update_met_tower_wdspd_tag("Met", wdspd_tag)
+
+	if num_met_at_site != '1':
+			for i in range(2,int(num_met_at_site)+1):
+				met_id = f"Met{i}"
+				insert_new_met_tower_row(met_id)
+				temp_tag = CsvInteractor.get_met_temp_tag(csv_map)
+				wdspd_tag = CsvInteractor.get_met_wdpsd_tag(csv_map)
+				update_met_tower_temp_tag(met_id,temp_tag)
+				update_met_tower_wdspd_tag(met_id,wdspd_tag)
 	else:
-		for i in range(2,int(num_met_at_site)+1):
-			met_id = f"Met{i}"
-			insert_new_met_tower_row(met_id)
-			temp_tag = CsvInteractor.get_met_temp_tag(csv_map)
-			wdspd_tag = CsvInteractor.get_met_wdpsd_tag(csv_map)
-			update_met_tower_temp_tag(met_id,temp_tag)
-			update_met_tower_wdspd_tag(met_id,wdspd_tag)
+		only_one_met_tower_at_site(num_met_at_site)
+		return
 
 
 def update_site_name( site_name):
