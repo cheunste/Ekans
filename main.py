@@ -19,6 +19,8 @@ def main():
 			Ekans.update_longtitude(CsvInteractor.get_longtitude(csv_map))
 			Ekans.update_site_name(CsvInteractor.get_site_prefix(csv_map))
 			Ekans.update_utc(CsvInteractor.get_utc_offset(csv_map))
+			Ekans.update_season_start_date(CsvInteractor.get_season_start_date(csv_map))
+			Ekans.update_season_end_date(CsvInteractor.get_season_end_date(csv_map))
 			Ekans.insert_to_turbine_input_table(csv_map)
 			Ekans.insert_to_turbine_output_table(csv_map)
 			Ekans.update_met_tower(csv_map)

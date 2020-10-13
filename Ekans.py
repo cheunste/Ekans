@@ -90,11 +90,22 @@ def update_utc( utc):
 	execute_database_query(query)
 
 
+def update_season_start_date(start_date):
+	query = f"Update SystemInputTags set DefaultValue = \"{start_date}\" where Description=\"BatSeasonStartDate\""
+	execute_database_query(query)
+
+
+def update_season_end_date(end_date):
+	query = f"Update SystemInputTags set DefaultValue = \"{end_date}\" where Description=\"BatSeasonEndDate\""
+	execute_database_query(query)
+
+
 def update_met_tower_wdspd_tag(met_id,tag):
 	table="MetTowerInputTags"
 	modified_tag = tag.replace("Met",met_id)
 	query = f"Update {table} set WindSpeedValueTag='{modified_tag}' where MetId='{met_id}'"
 	DatabaseInteractor.execute_database_query(query)
+
 
 def update_met_tower_temp_tag(met_id,tag):
 	table="MetTowerInputTags"
@@ -110,6 +121,7 @@ def only_one_met_tower_at_site(num_met_tower):
 		query = f"Delete from MetTowerOutputTags where MetId==\"Met2\""
 		execute_database_query(query)
 
+
 def insert_new_met_tower_row(met_id):
 	table="MetTowerInputTags"
 	default_met_row = DatabaseInteractor.read_database_row(f"Select * from {table} Where MetId='Met'")
@@ -122,8 +134,9 @@ def insert_new_met_tower_row(met_id):
 	default_met_row = DatabaseInteractor.read_database_row(f"Select * from {table} Where MetId='Met'")
 	new_row = [tuple([item.replace("Met", met_id) for item in default_met_row[0]])]
 	print(new_row)
-	query = f"Insert into {table} Values (?,?,?,?,?,?)"
+	query = f"Insert into {table} Values (?,?,?,?,?,?,?,?)"
 	DatabaseInteractor.execute_many_database_query(query,new_row)
+
 
 def copy_database_file( src_file_path, dest_file_path):
 	shutil.copy2(src_file_path,dest_file_path)
@@ -140,16 +153,20 @@ def generate_new_input_tag_row(row,id,metbackup,backup_turbine_list):
 	new_row[9] = metbackup
 	return tuple(new_row)
 
+
 def generate_new_output_tag_row(row,id):
 	new_row = [item.replace("T001",id) for item in row]
 	return tuple(new_row)
 
+
 def is_backup_turbine(turbine_row,backup_turbine_list):
 	return turbine_row in backup_turbine_list
+
 
 def make_turbine_backup(turbine_Id):
 	DatabaseInteractor.execute_database_query(
 		f"Update TurbineInputTags set IsBackupTurbine = 'true' where TurbineId = '{turbine_Id}'")
+
 
 def get_default_row(turbine_table):
 	return DatabaseInteractor.read_database_row(f"SELECT * from {turbine_table} WHERE TurbineId=='T001'")

@@ -13,7 +13,8 @@ class CsvTestClass(unittest.TestCase):
 	csv_file_path = r"./csvFile.csv"
 	csv_map = {'site prefix': 'DESER', 'Number of Turbines at Site': '104', 'UTC Offset': '-5',
 	           'Turbine Backup': 'T001,T002,T003,T004', 'Met Backup Cutoff (inclusive)': 'T015', 'Latitude': '1',
-	           'Longtitude': '1','Number of Met Towers': '2','Met WdSpd Tag':'xxx','Met Temp Tag':'yyy'}
+	           'Longtitude': '1','Number of Met Towers': '2','Met WdSpd Tag':'xxx','Met Temp Tag':'yyy',
+	           'Season Start':'07/20','Season End':'10/20'}
 	def test_update_DB_path(self):
 		DatabaseInteractor.configuration_db_path = f"Test-ZubatConfiguration.db"
 
@@ -39,7 +40,7 @@ class CsvTestClass(unittest.TestCase):
 	def test_contain_correct_headers(self):
 		required_headers = [r"site prefix",r"Number of Turbines at Site",r"UTC Offset",r"Turbine Backup",
 		                    f"Met Backup Cutoff (inclusive)",r"Latitude",r"Longtitude", "Number of Met Towers",
-		                    "Met WdSpd Tag","Met Temp Tag"]
+		                    "Met WdSpd Tag","Met Temp Tag","Season Start","Season End"]
 		with open(self.csv_file_path,newline='') as csvFile:
 			csvFileReader = csv.reader(csvFile,delimiter=',')
 			line = next(csvFileReader)
@@ -96,6 +97,13 @@ class CsvTestClass(unittest.TestCase):
 		lon = CsvInteractor.get_num_met_tower(self.csv_map)
 		self.assertTrue(lon == '2')
 
+	def test_season_start(self):
+		start_date = CsvInteractor.get_season_start_date(self.csv_map)
+		self.assertTrue(start_date == '07/20')
+
+	def test_season_end(self):
+		end_date = CsvInteractor.get_season_end_date(self.csv_map)
+		self.assertTrue(end_date == '10/20')
 
 	def test_met_wdspd_tag(self):
 		wdspd_tag = CsvInteractor.get_met_wdpsd_tag(self.csv_map)
@@ -104,6 +112,7 @@ class CsvTestClass(unittest.TestCase):
 	def test_wdspd_tag(self):
 		temp_tag = CsvInteractor.get_met_temp_tag(self.csv_map)
 		self.assertTrue(temp_tag == 'yyy')
+
 
 class DatabaseTestClass(unittest.TestCase):
 	csv_file_path = r"./csvFile.csv"
@@ -136,18 +145,18 @@ class DatabaseTestClass(unittest.TestCase):
 	def test_tuple_list_insert(self):
 		query = 'INSERT INTO TurbineINputTags VALUES (?,?,?,?,?,?,?,?,?,?)'
 		rows = [
-		        ('T100','Zubat.T100.Participation','T100.WTUR.TURST.ACTST','T100.WNAC.ExTmp','T100.WNAC.WdSpd','','T100.WTUR.SetTurOp.ActSt.Stop','T100.WTUR.SetTurOp.ActSt.Str','Zubat.T100.PauseTimeOut','Met'),
-		        ('T100','Zubat.T100.Participation','T100.WTUR.TURST.ACTST','T100.WNAC.ExTmp','T100.WNAC.WdSpd','','T100.WTUR.SetTurOp.ActSt.Stop','T100.WTUR.SetTurOp.ActSt.Str','Zubat.T100.PauseTimeOut','Met'),
-		        ('T100','Zubat.T100.Participation','T100.WTUR.TURST.ACTST','T100.WNAC.ExTmp','T100.WNAC.WdSpd','','T100.WTUR.SetTurOp.ActSt.Stop','T100.WTUR.SetTurOp.ActSt.Str','Zubat.T100.PauseTimeOut','Met')
+		        ('T300','Zubat.T300.Participation','T300.WTUR.TURST.ACTST','T300.WNAC.ExTmp','T300.WNAC.WdSpd','','T300.WTUR.SetTurOp.ActSt.Stop','T300.WTUR.SetTurOp.ActSt.Str','Zubat.T300.PauseTimeOut','Met'),
+		        ('T300','Zubat.T300.Participation','T300.WTUR.TURST.ACTST','T300.WNAC.ExTmp','T300.WNAC.WdSpd','','T300.WTUR.SetTurOp.ActSt.Stop','T300.WTUR.SetTurOp.ActSt.Str','Zubat.T300.PauseTimeOut','Met'),
+		        ('T300','Zubat.T300.Participation','T300.WTUR.TURST.ACTST','T300.WNAC.ExTmp','T300.WNAC.WdSpd','','T300.WTUR.SetTurOp.ActSt.Stop','T300.WTUR.SetTurOp.ActSt.Str','Zubat.T300.PauseTimeOut','Met')
 		        ]
 		DatabaseInteractor.execute_many_database_query(query,rows)
 
-		read_query = "SELECT * from TurbineInputTags where TurbineId=='T100'"
+		read_query = "SELECT * from TurbineInputTags where TurbineId=='T300'"
 		connection = DatabaseInteractor.connect_to_database()
 		result = connection.cursor().execute(read_query).fetchall()
 		self.assertIsNotNone(result)
-		self.assertTrue(len(result) == 4)
-		delete_query = "DELETE from TurbineInputTags where TurbineId=='T100'"
+		self.assertTrue(len(result) == 3)
+		delete_query = "DELETE from TurbineInputTags where TurbineId=='T300'"
 		DatabaseInteractor.execute_database_query(delete_query)
 		connection.close()
 
@@ -157,6 +166,7 @@ class EkansTestClass(unittest.TestCase):
 	csv_map = {'site prefix': 'DESER', 'Number of Turbines at Site': '104', 'UTC Offset': '-5',
 	           'Turbine Backup': 'T001,T002,T003,T004', 'Met Backup Cutoff (inclusive)': 'T015', 'Latitude': '1',
 	           'Longtitude': '1','Number of Met Towers': '2','Met WdSpd Tag':'xxx','Met Temp Tag':'yyy'}
+
 	def test_update_site_name(self):
 		site_prefix = "DESER"
 		Ekans.update_site_name(site_prefix)
@@ -193,6 +203,20 @@ class EkansTestClass(unittest.TestCase):
 		turbine_num = 130
 		new_turbine_id = Ekans.build_turbine_id(turbine_num)
 		self.assertTrue(new_turbine_id == "T130")
+
+	def test_season_start(self):
+		default_start = "07/20"
+		Ekans.update_season_start_date(default_start)
+		season_start=\
+			DatabaseInteractor.read_database_query(("select DefaultValue from SystemInputTags where description =\"BatSeasonStartDate\""))
+		self.assertTrue(default_start == str(season_start))
+
+	def test_season_end(self):
+		default_end = "10/20"
+		Ekans.update_season_end_date(default_end)
+		season_end=\
+			DatabaseInteractor.read_database_query(("select DefaultValue from SystemInputTags where description =\"BatSeasonEndDate\""))
+		self.assertTrue(default_end == str(season_end))
 
 	def test_replace_turbine_number(self):
 		dummmy_row = "T001,Zubat.T001.Participation,T001.WTUR.TURST.ACTST," \

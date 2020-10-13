@@ -89,6 +89,11 @@ def get_number_of_turbines_in_csv(csv_map):
 def get_utc_offset(csv_map):
 	return csv_map['UTC Offset']
 
+def get_season_start_date(csv_map):
+	return csv_map['Season Start']
+
+def get_season_end_date(csv_map):
+	return csv_map['Season End']
 
 def get_turbine_backup(csv_map):
 	return csv_map['Turbine Backup']
